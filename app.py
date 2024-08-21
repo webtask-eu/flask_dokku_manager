@@ -27,5 +27,17 @@ def remove_container(container_id):
         return f"Error removing container {container_id}: {error}", 500
     return redirect(url_for('index'))
 
+@app.route('/start/<container_id>')
+def start_container(container_id):
+    _, error = run_command(f'docker start {container_id}')
+    if error:
+        return f"Error starting container {container_id}: {error}", 500
+    return redirect(url_for('index'))
+
+@app.route('/logs/<container_id>')
+def view_logs(container_id):
+    logs, _ = run_command(f'docker logs {container_id}')
+    return render_template('logs.html', container_id=container_id, logs=logs)
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
