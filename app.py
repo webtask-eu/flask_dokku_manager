@@ -4,7 +4,7 @@ import subprocess
 app = Flask(__name__)
 
 def run_command(command):
-    """Запуск команды в системе и возврат результата"""
+    """Запуск команды в системе и возврат результата 2"""
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
     return result.stdout.strip()
 
