@@ -8,11 +8,15 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
     - name: Deploy to server
-      run: ssh 168.119.152.75 'cd /root/flask_dokku_manager && git pull origin master && systemctl restart flask_app'
       env:
-        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_PRIVATE_KEY }}
+      run: |
+        echo "${SSH_PRIVATE_KEY}" > /tmp/private_key
+        chmod 600 /tmp/private_key
+        ssh -o StrictHostKeyChecking=no -i /tmp/private_key root@168.119.152.75 'cd /root/flask_dokku_manager && git pull origin master && systemctl restart flask_app'
