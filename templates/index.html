@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Dokku App Manager</title>
+</head>
+<body>
+    <h1>Dokku App Manager</h1>
+    <table border="1">
+        <tr>
+            <th>App Name</th>
+            <th>Deployed</th>
+            <th>Processes</th>
+            <th>Running</th>
+            <th>Actions</th>
+        </tr>
+        {% for app, deployed, processes, running in apps_status %}
+        <tr>
+            <td>{{ app }}</td>
+            <td>{{ deployed }}</td>
+            <td>{{ processes }}</td>
+            <td>{{ running }}</td>
+            <td>
+                <a href="{{ url_for('restart', app_name=app) }}">Restart</a> | 
+                <a href="{{ url_for('stop', app_name=app) }}">Stop</a> | 
+                <a href="{{ url_for('logs', app_name=app) }}">View Logs</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

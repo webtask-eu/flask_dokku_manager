@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Restarting {{ app_name }}</title>
+    <script>
+        function loadLog() {
+            var logContainer = document.getElementById("log");
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "{{ url_for('restart_log', app_name=app_name) }}", true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                    logContainer.innerHTML += xhr.responseText.replace(/\n/g, '<br>');
+                }
+            };
+            xhr.send();
+        }
+        loadLog();  // Start loading logs immediately
+    </script>
+</head>
+<body>
+    <h1>Restarting {{ app_name }}</h1>
+    <div id="log" style="border:1px solid #000; padding:10px; height:400px; overflow:auto;">
+        Loading logs...
+    </div>
+</body>
+</html>
