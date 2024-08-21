@@ -6,3 +6,6 @@ sudo systemctl status flask_app
 
 sudo systemctl stop flask_app
 sudo systemctl start flask_app
+
+dokku ps:report exel-to-contract --running
+
