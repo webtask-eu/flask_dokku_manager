@@ -1,55 +1,31 @@
-from flask import Flask, render_template, redirect, url_for, Response, stream_with_context
+from flask import Flask, render_template, redirect, url_for
 import subprocess
 
 app = Flask(__name__)
 
 def run_command(command):
-    """Запуск команды в системе и возврат результата 4"""
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
-    return result.stdout.strip()
-
-def stream_command(command):
-    """Генерация логов в реальном времени"""
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    for line in process.stdout:
-        yield line
-    process.wait()
+    result = subprocess.run(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    return result.stdout.strip(), result.stderr.strip()
 
 @app.route('/')
 def index():
-    apps_status = get_apps_status()
-    return render_template('index.html', apps_status=apps_status)
+    containers, _ = run_command('docker ps -a --format "{{.ID}} {{.Image}} {{.Status}} {{.Names}}"')
+    containers = [container.split() for container in containers.splitlines()]
+    return render_template('index.html', containers=containers)
 
-@app.route('/restart/<app_name>')
-def restart(app_name):
-    return render_template('restart.html', app_name=app_name)
-
-@app.route('/restart_log/<app_name>')
-def restart_log(app_name):
-    command = f"dokku ps:restart {app_name}"
-    return Response(stream_with_context(stream_command(command)), mimetype='text/plain')
-
-@app.route('/stop/<app_name>')
-def stop(app_name):
-    run_command(f"dokku ps:stop {app_name}")
+@app.route('/stop/<container_id>')
+def stop_container(container_id):
+    _, error = run_command(f'docker stop {container_id}')
+    if error:
+        return f"Error stopping container {container_id}: {error}", 500
     return redirect(url_for('index'))
 
-@app.route('/logs/<app_name>')
-def logs(app_name):
-    logs_output = run_command(f"dokku logs {app_name}")
-    return f"<pre>{logs_output}</pre>"
-
-def get_apps_status():
-    """Получить список приложений и их статус"""
-    output = run_command("dokku apps:list")
-    apps = output.strip().split('\n')[1:]  # Пропускаем заголовок
-    apps_status = []
-    for app in apps:
-        deployed = run_command(f"dokku ps:report {app} --deployed")
-        processes = run_command(f"dokku ps:report {app} --processes")
-        running = run_command(f"dokku ps:report {app} --running")
-        apps_status.append((app, deployed, processes, running))
-    return apps_status
+@app.route('/remove/<container_id>')
+def remove_container(container_id):
+    _, error = run_command(f'docker rm {container_id}')
+    if error:
+        return f"Error removing container {container_id}: {error}", 500
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
