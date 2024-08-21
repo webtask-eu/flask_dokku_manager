@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Logs for {{ container_id }}</title>
+    <title>Logs for {{ app_name }}</title>
 </head>
 <body>
-    <h1>Logs for Container {{ container_id }}</h1>
+    <h1>Logs for Application {{ app_name }}</h1>
     <pre>{{ logs }}</pre>
     <a href="{{ url_for('index') }}">Back to Home</a>
 </body>

@@ -6,29 +6,38 @@
     <title>Flask Dokku Manager</title>
 </head>
 <body>
-    <h1>Running Containers</h1>
-    <table border="1">
-        <tr>
-            <th>Container ID</th>
-            <th>Image</th>
-            <th>Status</th>
-            <th>Name</th>
-            <th>Actions</th>
-        </tr>
-        {% for container in containers %}
-        <tr>
-            <td>{{ container[0] }}</td>
-            <td>{{ container[1] }}</td>
-            <td>{{ container[2] }}</td>
-            <td>{{ container[3] }}</td>
-            <td>
-                <a href="{{ url_for('start_container', container_id=container[0]) }}">Start</a> |
-                <a href="{{ url_for('stop_container', container_id=container[0]) }}">Stop</a> |
-                <a href="{{ url_for('remove_container', container_id=container[0]) }}">Remove</a> |
-                <a href="{{ url_for('view_logs', container_id=container[0]) }}">View Logs</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+    <h1>Applications and Containers</h1>
+    {% for app, containers in app_containers.items() %}
+    <div>
+        <h2>{{ app }}</h2>
+        <p>
+            <a href="{{ url_for('restart_app', app_name=app) }}">Restart Application</a> |
+            <a href="{{ url_for('view_logs', app_name=app) }}">View Logs</a>
+        </p>
+        <table border="1">
+            <tr>
+                <th>Container ID</th>
+                <th>Image</th>
+                <th>Status</th>
+                <th>Name</th>
+                <th>Actions</th>
+            </tr>
+            {% for container in containers %}
+            <tr>
+                <td>{{ container[0] }}</td>
+                <td>{{ container[1] }}</td>
+                <td>{{ container[2] }}</td>
+                <td>{{ container[3] }}</td>
+                <td>
+                    <a href="{{ url_for('start_container', container_id=container[0]) }}">Start</a> |
+                    <a href="{{ url_for('stop_container', container_id=container[0]) }}">Stop</a> |
+                    <a href="{{ url_for('remove_container', container_id=container[0]) }}">Remove</a> |
+                    <a href="{{ url_for('view_logs', app_name=app) }}">View Logs</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    {% endfor %}
 </body>
 </html>
